@@ -1,4 +1,4 @@
-use crate::client;
+use crate::client::{self, V2_URL};
 
 use base64::{engine::general_purpose, Engine as _};
 use reqwest::header::HeaderMap;
@@ -6,8 +6,8 @@ use reqwest::header::HeaderMap;
 pub async fn get_auth_token(client: &client::Client) -> Result<String, Box<dyn std::error::Error>> {
     let auth_key = "bcd151073c03b352e1ef2fd66c32209da9ca0afa";
 
-    let auth1_url = "https://radiko.jp/v2/api/auth1";
-    let auth2_url = "https://radiko.jp/v2/api/auth2";
+    let auth1_url = format!("{}api/auth1", V2_URL);
+    let auth2_url = format!("{}api/auth2", V2_URL);
 
     // auth1
     let mut headers = HeaderMap::new();

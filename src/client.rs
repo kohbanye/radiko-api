@@ -8,8 +8,8 @@ pub struct Client {
     pub area_id: String,
 }
 
-pub const V2_API_URL: &str = "https://radiko.jp/v2/api/";
-pub const V3_API_URL: &str = "https://radiko.jp/v3/api/";
+pub const V2_URL: &str = "https://radiko.jp/v2/";
+pub const V3_URL: &str = "https://radiko.jp/v3/";
 
 impl Client {
     pub async fn new() -> Result<Client, Box<dyn std::error::Error>> {
