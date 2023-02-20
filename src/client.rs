@@ -28,7 +28,7 @@ impl Client {
     }
 
     pub async fn set_area_id(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        self.area_id = area::get_area().await?;
+        self.area_id = area::get_area_id().await?;
         Ok(())
     }
 }
