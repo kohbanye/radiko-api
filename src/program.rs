@@ -85,6 +85,7 @@ fn parse_programs_xml(xml_str: &str) -> Result<Vec<Program>, Box<dyn std::error:
     Ok(programs)
 }
 
+/// Get all programs of the date
 pub async fn get_programs_by_date(
     station_id: &str,
     date: DateTime<Local>,
@@ -102,4 +103,18 @@ pub async fn get_programs_by_date(
     let programs = parse_programs_xml(&body)?;
 
     Ok(programs)
+}
+
+/// Get a program by start time
+pub async fn get_program_by_start_time(
+    station_id: &str,
+    start_at: DateTime<Local>,
+) -> Result<Program, Box<dyn std::error::Error>> {
+    let programs = get_programs_by_date(station_id, start_at).await?;
+    let program = programs
+        .into_iter()
+        .find(|p| p.start_at == start_at)
+        .ok_or("Program not found")?;
+
+    Ok(program)
 }
