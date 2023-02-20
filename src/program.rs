@@ -1,5 +1,5 @@
 use crate::client::V3_URL;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Local, TimeZone};
 
 #[derive(Debug)]
 pub struct Station {
@@ -12,6 +12,8 @@ pub struct Station {
 pub struct Program {
     pub title: String,
     pub url: String,
+    pub start_at: DateTime<Local>,
+    pub end_at: DateTime<Local>,
     pub ft: String,
     pub to: String,
 }
@@ -66,9 +68,15 @@ fn parse_programs_xml(xml_str: &str) -> Result<Vec<Program>, Box<dyn std::error:
         let title = get_child_text("title").unwrap();
         let url = get_child_text("url").unwrap_or("");
 
+        let ft = program.attribute("ft").unwrap();
+        let to = program.attribute("to").unwrap();
+        let fmt = "%Y%m%d%H%M%S";
+
         programs.push(Program {
             title: title.to_string(),
             url: url.to_string(),
+            start_at: Local.datetime_from_str(ft, fmt)?,
+            end_at: Local.datetime_from_str(to, fmt)?,
             ft: program.attribute("ft").unwrap().to_string(),
             to: program.attribute("to").unwrap().to_string(),
         });
