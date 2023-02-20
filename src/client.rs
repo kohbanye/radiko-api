@@ -1,7 +1,7 @@
-use crate::auth;
 use crate::area;
+use crate::auth;
 
-#[derive(Default)]
+#[derive(Default, Clone, Debug)]
 pub struct Client {
     pub client: reqwest::Client,
     pub auth_token: String,

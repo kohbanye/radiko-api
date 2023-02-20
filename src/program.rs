@@ -43,7 +43,7 @@ fn parse_stations_xml(xml_str: &str) -> Result<Vec<Station>, Box<dyn std::error:
     Ok(stations)
 }
 
-pub async fn get_stations(area_id: String) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
+pub async fn get_stations(area_id: &str) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
     let url = format!("{}station/list/{}.xml", V3_URL, area_id);
 
     let res = reqwest::get(url).await?;
