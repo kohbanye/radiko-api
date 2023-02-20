@@ -9,7 +9,7 @@ pub struct Station {
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "href")]
-    pub link: String,
+    pub url: String,
 }
 
 #[derive(Default, Debug, Deserialize)]

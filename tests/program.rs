@@ -6,7 +6,7 @@ async fn test_get_stations() -> Result<(), Box<dyn std::error::Error>> {
 
     assert!(!stations[0].id.is_empty());
     assert!(!stations[0].name.is_empty());
-    assert!(!stations[0].link.is_empty());
+    assert!(!stations[0].url.is_empty());
 
     for station in stations {
         if station.id == "JOAK-FM" {
