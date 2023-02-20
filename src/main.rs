@@ -3,7 +3,7 @@ mod client;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = client::Client::new();
+    let mut client: client::Client = Default::default();
     client.auth().await?;
 
     println!("{}", client.auth_token);
