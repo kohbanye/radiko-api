@@ -12,6 +12,14 @@ pub const V2_API_URL: &str = "https://radiko.jp/v2/api/";
 pub const V3_API_URL: &str = "https://radiko.jp/v3/api/";
 
 impl Client {
+    pub async fn new() -> Result<Client, Box<dyn std::error::Error>> {
+        let mut client: Client = Default::default();
+        client.auth().await?;
+        client.set_area_id().await?;
+
+        Ok(client)
+    }
+
     pub fn request(&self, method: reqwest::Method, url_path: &str) -> reqwest::RequestBuilder {
         if self.auth_token.is_empty() {
             panic!("auth_token is empty");
@@ -22,12 +30,12 @@ impl Client {
             .header("X-Radiko-AuthToken", &self.auth_token)
     }
 
-    pub async fn auth(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    async fn auth(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         self.auth_token = auth::get_auth_token(self).await?;
         Ok(())
     }
 
-    pub async fn set_area_id(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    async fn set_area_id(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         self.area_id = area::get_area_id().await?;
         Ok(())
     }

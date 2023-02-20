@@ -2,8 +2,7 @@ use radiko_sdk::client::Client;
 
 #[tokio::test]
 async fn test_auth() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client: Client = Default::default();
-    client.auth().await?;
+    let client = Client::new().await?;
 
     assert!(!client.auth_token.is_empty());
 
@@ -12,8 +11,7 @@ async fn test_auth() -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::test]
 async fn test_get_area() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client: Client = Default::default();
-    client.set_area_id().await?;
+    let client = Client::new().await?;
 
     assert!(client.area_id.contains("JP"));
 
