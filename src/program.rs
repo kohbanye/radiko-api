@@ -1,4 +1,4 @@
-use crate::client::{Client, V3_URL};
+use crate::client::V3_URL;
 use chrono::{DateTime, Local};
 
 #[derive(Debug)]
@@ -41,11 +41,10 @@ fn parse_stations_xml(xml_str: &str) -> Result<Vec<Station>, Box<dyn std::error:
     Ok(stations)
 }
 
-pub async fn get_stations(client: &Client) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
-    let url = format!("{}station/list/{}.xml", V3_URL, client.area_id);
+pub async fn get_stations(area_id: String) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
+    let url = format!("{}station/list/{}.xml", V3_URL, area_id);
 
-    let req = client.request(reqwest::Method::GET, &url);
-    let res = req.send().await?;
+    let res = reqwest::get(url).await?;
     let body = res.text().await?;
 
     let stations = parse_stations_xml(&body)?;
@@ -79,7 +78,6 @@ fn parse_programs_xml(xml_str: &str) -> Result<Vec<Program>, Box<dyn std::error:
 }
 
 pub async fn get_programs_by_date(
-    client: &Client,
     station_id: &str,
     date: DateTime<Local>,
 ) -> Result<Vec<Program>, Box<dyn std::error::Error>> {
@@ -90,8 +88,7 @@ pub async fn get_programs_by_date(
         station_id
     );
 
-    let req = client.request(reqwest::Method::GET, &url);
-    let res = req.send().await?;
+    let res = reqwest::get(url).await?;
     let body = res.text().await?;
 
     let programs = parse_programs_xml(&body)?;
