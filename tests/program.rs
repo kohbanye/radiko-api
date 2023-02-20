@@ -13,6 +13,7 @@ async fn test_get_stations() -> Result<(), Box<dyn std::error::Error>> {
     for station in stations {
         if station.id == "JOAK-FM" {
             assert_eq!(station.name, "NHK-FM（東京）");
+            assert_eq!(station.url, "https://www.nhk.or.jp/radio/");
         }
     }
 

@@ -1,31 +1,44 @@
 use crate::client::{Client, V3_URL};
 use chrono::{DateTime, Local};
 
-use serde::Deserialize;
-
-#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename = "station")]
+#[derive(Debug)]
 pub struct Station {
-    #[serde(rename = "id")]
     pub id: String,
-    #[serde(rename = "name")]
     pub name: String,
-    #[serde(rename = "href")]
     pub url: String,
 }
 
-#[derive(Default, Debug, Deserialize)]
-#[serde(default, rename = "stations")]
-struct StationsXML {
-    #[serde(rename = "station")]
-    stations: Vec<Station>,
-}
-
+#[derive(Debug)]
 pub struct Program {
     pub title: String,
     pub url: String,
     pub ft: String,
     pub to: String,
+}
+
+fn parse_stations_xml(xml_str: &str) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
+    let doc = roxmltree::Document::parse(xml_str)?;
+    let mut stations = vec![];
+
+    for station in doc.descendants().filter(|n| n.has_tag_name("station")) {
+        let get_child_text = |name: &str| -> Option<&str> {
+            station
+                .children()
+                .find(|n| n.has_tag_name(name))
+                .and_then(|n| n.text())
+        };
+        let id = get_child_text("id").unwrap();
+        let name = get_child_text("name").unwrap();
+        let url = get_child_text("href").unwrap_or("");
+
+        stations.push(Station {
+            id: id.to_string(),
+            name: name.to_string(),
+            url: url.to_string(),
+        });
+    }
+
+    Ok(stations)
 }
 
 pub async fn get_stations(client: &Client) -> Result<Vec<Station>, Box<dyn std::error::Error>> {
@@ -35,9 +48,9 @@ pub async fn get_stations(client: &Client) -> Result<Vec<Station>, Box<dyn std::
     let res = req.send().await?;
     let body = res.text().await?;
 
-    let stations_xml: StationsXML = quick_xml::de::from_str(&body)?;
+    let stations = parse_stations_xml(&body)?;
 
-    Ok(stations_xml.stations)
+    Ok(stations)
 }
 
 fn parse_programs_xml(xml_str: &str) -> Result<Vec<Program>, Box<dyn std::error::Error>> {
