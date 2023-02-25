@@ -1,4 +1,4 @@
-use chrono::Local;
+use chrono::{Local, TimeZone};
 
 #[tokio::test]
 async fn test_get_stations() -> Result<(), Box<dyn std::error::Error>> {
@@ -48,5 +48,21 @@ async fn test_get_program_by_start_time() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(program.start_at, programs[0].start_at);
     assert_eq!(program.end_at, programs[0].end_at);
 
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_show_stations() -> Result<(), Box<dyn std::error::Error>> {
+    let area_id = "JP13";
+    radiko_sdk::program::show_stations(area_id).await?;
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_show_programs_by_date() -> Result<(), Box<dyn std::error::Error>> {
+    let station_id = "TBS";
+    let date =
+        Local::datetime_from_str(&Local, "2023-02-20 05:00:00", "%Y-%m-%d %H:%M:%S").unwrap();
+    radiko_sdk::program::show_programs_by_date(station_id, date).await?;
     Ok(())
 }

@@ -1,5 +1,6 @@
 use crate::client::V3_URL;
 use chrono::{DateTime, Local, TimeZone};
+use prettytable::{row, Table};
 
 #[derive(Debug)]
 pub struct Station {
@@ -117,4 +118,37 @@ pub async fn get_program_by_start_time(
         .ok_or("Program not found")?;
 
     Ok(program)
+}
+
+/// Show stations of the area
+pub async fn show_stations(area_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let stations = get_stations(area_id).await?;
+
+    let mut table = Table::new();
+    table.add_row(row!["ID", "NAME"]);
+    for station in stations {
+        table.add_row(row![station.id, station.name]);
+    }
+
+    table.printstd();
+
+    Ok(())
+}
+
+/// Show programs of the date
+pub async fn show_programs_by_date(
+    station_id: &str,
+    date: DateTime<Local>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let programs = get_programs_by_date(station_id, date).await?;
+
+    let mut table = Table::new();
+    table.add_row(row!["START", "TITLE"]);
+    for program in programs {
+        table.add_row(row![program.start_at.format("%H:%M"), program.title]);
+    }
+
+    table.printstd();
+
+    Ok(())
 }

@@ -10,6 +10,7 @@ base64 = "0.21.0"
 chrono = "0.4.23"
 log = "0.4.17"
 m3u8-rs = "5.0.3"
+prettytable-rs = "0.10.0"
 regex = "1.7.1"
 reqwest = { version = "0.11.14", features = ["blocking"] }
 roxmltree = "0.18.0"
