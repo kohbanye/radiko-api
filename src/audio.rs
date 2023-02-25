@@ -1,3 +1,9 @@
+use std::{
+    fs,
+    io::{self, Write},
+    process, thread,
+};
+
 use chrono::{DateTime, Local};
 
 use crate::{
@@ -56,4 +62,63 @@ pub async fn get_audio_urls(
     }
 
     Ok(audio_urls)
+}
+
+/// Download .aac files concurrently.
+pub fn download_files(
+    urls: Vec<String>,
+    dir: &str,
+) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let mut handles = vec![];
+    let mut filenames = vec![];
+
+    for url in urls {
+        let filename = url.split('/').last().unwrap();
+        filenames.push(filename.to_string());
+
+        let path = format!("{}/{}", dir, filename);
+        let handle = thread::spawn(move || {
+            let mut file = fs::File::create(&path).unwrap();
+            let mut res = reqwest::blocking::get(&url).unwrap();
+            io::copy(&mut res, &mut file).unwrap();
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    Ok(filenames)
+}
+
+/// Download .aac files and concat them into one file.
+pub fn concat_aac_files(
+    filenames: Vec<String>,
+    dir: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let input_path = format!("{}/resources", dir);
+    let output_path = format!("{}/output.aac", dir);
+
+    let mut input_file = fs::File::create(&input_path)?;
+    for filename in filenames {
+        let path = format!("{}/{}", dir, filename);
+        input_file.write_all(format!("file '{}'\n", path).as_bytes())?;
+    }
+
+    process::Command::new("ffmpeg")
+        .args(&[
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            &input_path,
+            "-c",
+            "copy",
+            &output_path,
+        ])
+        .output()
+        .expect("failed to execute process");
+
+    Ok(format!("{}/output.aac", dir))
 }
