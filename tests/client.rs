@@ -1,4 +1,4 @@
-use radiko_sdk::client::Client;
+use radiko_api::client::Client;
 
 #[tokio::test]
 async fn test_auth() -> Result<(), Box<dyn std::error::Error>> {
